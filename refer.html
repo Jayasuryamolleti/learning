@@ -1,0 +1,413 @@
+
+home.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eLearning Platform</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            color: #4caf50;
+        }
+
+        .section {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        #video-section iframe {
+            display: block;
+            margin: 0 auto;
+            width: 70%;
+            height: 60vh; /* Adjust height relative to the viewport */
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .progress-circle {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(#4caf50 var(--progress, 0%), #ddd 0%);
+        }
+
+        .progress-circle span {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #video-progress {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #video-progress .progress-bar {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Video Section -->
+    <section id="video-section" class="section">
+        <h2>Video Lesson</h2>
+        <iframe 
+            id="lesson-video"
+            src="https://www.youtube.com/watch?v=Q33KBiDriJY&list=PL9ooVrP1hQOEloRCBI97ZXkWUg6MJn0Yf" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+        <div id="video-progress">
+            <div class="progress-bar" id="video-progress-bar"></div>
+        </div>
+    </section>
+    <!-- Progress Section -->
+    <section id="progress-section" class="section">
+        <h2>Progress</h2>
+        <div class="progress-container">
+            <div class="progress-circle" style="--progress: 0%;" id="video-circle">
+                <span id="video-progress-percent">0%</span>
+            </div>
+            <div class="progress-circle" style="--progress: 0%;" id="quiz-circle">
+                <span id="quiz-progress-percent">0%</span>
+            </div>
+            <div class="progress-circle" style="--progress: 0%;" id="combined-circle">
+                <span id="combined-progress-percent">0%</span>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const videoProgressBar = document.getElementById("video-progress-bar");
+        const videoCircle = document.getElementById("video-circle");
+        const quizCircle = document.getElementById("quiz-circle");
+        const combinedCircle = document.getElementById("combined-circle");
+
+        const videoProgressPercent = document.getElementById("video-progress-percent");
+        const quizProgressPercent = document.getElementById("quiz-progress-percent");
+        const combinedProgressPercent = document.getElementById("combined-progress-percent");
+
+        let videoProgress = 0;
+        let questionsAnswered = 0;
+        const totalQuestions = 1; // Update this if more questions are added
+        let quizCompleted = false;
+
+        function updateFinalProgress() {
+            const videoWeight = videoProgress * 0.5; // Video contributes 50%
+            const quizWeight = (questionsAnswered / totalQuestions) * 50; // Quiz contributes 50%
+            const totalProgress = videoWeight + quizWeight;
+
+            // Update all progress circles
+            videoCircle.style.setProperty("--progress", `${videoProgress}%`);
+            quizCircle.style.setProperty("--progress", `${quizWeight}%`);
+            combinedCircle.style.setProperty("--progress", `${totalProgress}%`);
+
+            videoProgressPercent.textContent = `${Math.round(videoProgress)}%`;
+            quizProgressPercent.textContent = `${Math.round(quizWeight)}%`;
+            combinedProgressPercent.textContent = `${Math.round(totalProgress)}%`;
+        }
+
+        function updateVideoProgress() {
+            const iframe = document.getElementById("lesson-video");
+            const player = new YT.Player(iframe, {
+                events: {
+                    onStateChange: (event) => {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            const interval = setInterval(() => {
+                                const currentTime = player.getCurrentTime();
+                                const duration = player.getDuration();
+                                videoProgress = (currentTime / duration) * 100;
+
+                                videoProgressBar.style.width = `${videoProgress}%`;
+                                updateFinalProgress();
+
+                                if (videoProgress >= 100) {
+                                    clearInterval(interval); // Stop interval when video is fully watched
+                                }
+                            }, 1000);
+                        }
+                    },
+                },
+            });
+        }
+
+        function submitQuiz() {
+            const selectedOption = document.querySelector('input[name="quiz"]:checked');
+            if (!selectedOption) {
+                alert("Please select an answer!");
+                return;
+            }
+            alert("Quiz submitted successfully!");
+            questionsAnswered = totalQuestions; // Update this dynamically for multi-question quizzes
+            quizCompleted = true;
+            updateFinalProgress();
+        }
+
+        // Load YouTube IFrame API
+        function onYouTubeIframeAPIReady() {
+            updateVideoProgress();
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(script);
+    </script>
+
+</body>
+</html>
+
+
+
+python quiz//
+<section id="quiz-section" class="section">
+    <h2>Quiz Time!</h2>
+    <div id="quiz-container">
+        <!-- Question 1 -->
+        <div class="question">
+            <p>1. What is Python?</p>
+            <label><input type="radio" name="q1" value="0"> A programming language</label>
+            <label><input type="radio" name="q1" value="1"> A snake</label>
+            <label><input type="radio" name="q1" value="2"> A type of coffee</label>
+            <label><input type="radio" name="q1" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question">
+            <p>2. Which keyword is used to define a function in Python?</p>
+            <label><input type="radio" name="q2" value="0"> function</label>
+            <label><input type="radio" name="q2" value="1"> def</label>
+            <label><input type="radio" name="q2" value="2"> fun</label>
+            <label><input type="radio" name="q2" value="3"> define</label>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question">
+            <p>3. How do you write a comment in Python?</p>
+            <label><input type="radio" name="q3" value="0">//</label>
+            <label><input type="radio" name="q3" value="1">#</label>
+            <label><input type="radio" name="q3" value="2">/* */</label>
+            <label><input type="radio" name="q3" value="3"><!-- --></label>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question">
+            <p>4. Which of the following is a Python data type?</p>
+            <label><input type="radio" name="q4" value="0">String</label>
+            <label><input type="radio" name="q4" value="1">List</label>
+            <label><input type="radio" name="q4" value="2">Dictionary</label>
+            <label><input type="radio" name="q4" value="3">All of the above</label>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="question">
+            <p>5. Which method is used to add an element to a list?</p>
+            <label><input type="radio" name="q5" value="0">add()</label>
+            <label><input type="radio" name="q5" value="1">insert()</label>
+            <label><input type="radio" name="q5" value="2">append()</label>
+            <label><input type="radio" name="q5" value="3">push()</label>
+        </div>
+        <div class="question">
+            <p>7. What is the output of print(2 ** 3?</p>
+            <label><input type="radio" name="q7" value="6">add()</label>
+            <label><input type="radio" name="q7" value="8">insert()</label>
+            <label><input type="radio" name="q7" value="9">append()</label>
+            <label><input type="radio" name="q7" value="error">push()</label>
+        </div>
+        <div class="question">
+            <p>8.How do you create a variable in Python?</p>
+            <label><input type="radio" name="q8" value="var =5 ">add()</label>
+            <label><input type="radio" name="q8" value="x=5">insert()</label>
+            <label><input type="radio" name="q8" value="let x=5">append()</label>
+            <label><input type="radio" name="q8 value="xx=5">push()</label>
+        </div>
+        <div class="question">
+            <p>9. What does 'len()' do?</p>
+            <label><input type="radio" name="q9" value="0"> Calculates length of an object</label>
+            <label><input type="radio" name="q9" value="1"> Adds elements</label>
+            <label><input type="radio" name="q9" value="2"> Multiplies elements</label>
+            <label><input type="radio" name="q9" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question">
+            <p>10. Which of these is not a Python framework?</p>
+            <label><input type="radio" name="q2" value="10"> Django</label>
+            <label><input type="radio" name="q2" value="10"> Flask</label>
+            <label><input type="radio" name="q2" value="10"> React</label>
+            <label><input type="radio" name="q2" value="10"> Pyramid</label>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question">
+            <p>11. Which of these is used for web development in Python?</p>
+            <label><input type="radio" name="q3" value="11"> Tkinter</label>
+            <label><input type="radio" name="q3" value="11"> Flask</label>
+            <label><input type="radio" name="q3" value="11"> Pandas</label>
+            <label><input type="radio" name="q3" value="11"> Numpy</label>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question">
+            <p>12. What does 'if __name__ == "__main__":' mean?</p>
+            <label><input type="radio" name="q4" value="12"> Function declaration</label>
+            <label><input type="radio" name="q4" value="12"> Execution entry point</label>
+            <label><input type="radio" name="q4" value="12"> Variable assignment</label>
+            <label><input type="radio" name="q4" value="12"> None of the above</label>
+        </div>
+        <div class="question">
+            <p>1. What does 'len()' do?</p>
+            <label><input type="radio" name="q1" value="0"> Calculates length of an object</label>
+            <label><input type="radio" name="q1" value="1"> Adds elements</label>
+            <label><input type="radio" name="q1" value="2"> Multiplies elements</label>
+            <label><input type="radio" name="q1" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question">
+            <p>2. Which of these is not a Python framework?</p>
+            <label><input type="radio" name="q2" value="0"> Django</label>
+            <label><input type="radio" name="q2" value="1"> Flask</label>
+            <label><input type="radio" name="q2" value="2"> React</label>
+            <label><input type="radio" name="q2" value="3"> Pyramid</label>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question">
+            <p>3. Which of these is used for web development in Python?</p>
+            <label><input type="radio" name="q3" value="0"> Tkinter</label>
+            <label><input type="radio" name="q3" value="1"> Flask</label>
+            <label><input type="radio" name="q3" value="2"> Pandas</label>
+            <label><input type="radio" name="q3" value="3"> Numpy</label>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question">
+            <p>4. What does 'if __name__ == "__main__":' mean?</p>
+            <label><input type="radio" name="q4" value="0"> Function declaration</label>
+            <label><input type="radio" name="q4" value="1"> Execution entry point</label>
+            <label><input type="radio" name="q4" value="2"> Variable assignment</label>
+            <label><input type="radio" name="q4" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="question">
+            <p>5. How do you open a file in Python?</p>
+            <label><input type="radio" name="q5" value="0"> open()</label>
+            <label><input type="radio" name="q5" value="1"> file()</label>
+            <label><input type="radio" name="q5" value="2"> openfile()</label>
+            <label><input type="radio" name="q5" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="question">
+            <p>6. What is 'pip'?</p>
+            <label><input type="radio" name="q6" value="0"> Python package manager</label>
+            <label><input type="radio" name="q6" value="1"> Python compiler</label>
+            <label><input type="radio" name="q6" value="2"> Python interpreter</label>
+            <label><input type="radio" name="q6" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="question">
+            <p>7. What is a dictionary in Python?</p>
+            <label><input type="radio" name="q7" value="0"> List of key-value pairs</label>
+            <label><input type="radio" name="q7" value="1"> Set of unique values</label>
+            <label><input type="radio" name="q7" value="2"> Immutable sequence</label>
+            <label><input type="radio" name="q7" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="question">
+            <p>8. How do you start a for loop in Python?</p>
+            <label><input type="radio" name="q8" value="0"> for i in range(5):</label>
+            <label><input type="radio" name="q8" value="1"> for i = 0 to 5:</label>
+            <label><input type="radio" name="q8" value="2"> for (i = 0; i < 5; i++):</label>
+            <label><input type="radio" name="q8" value="3"> for each i in range(5)</label>
+        </div>
+
+        <!-- Question 9 -->
+        <div class="question">
+            <p>9. Which module is used for regular expressions in Python?</p>
+            <label><input type="radio" name="q9" value="0"> regex</label>
+            <label><input type="radio" name="q9" value="1"> re</label>
+            <label><input type="radio" name="q9" value="2"> regexp</label>
+            <label><input type="radio" name="q9" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 10 -->
+        <div class="question">
+            <p>10. What is a lambda function?</p>
+            <label><input type="radio" name="q10" value="0"> Anonymous function</label>
+            <label><input type="radio" name="q10" value="1"> Recursive function</label>
+            <label><input type="radio" name="q10" value="2"> A built-in function</label>
+            <label><input type="radio" name="q10" value="3"> None of the above</label>
+        </div>
+
+        <!-- Question 11 -->
+        <div class="question">
+            <p>11. Which of these is a mutable type?</p>
+            <label><input type="radio" name="q11" value="0"> String</label>
+            <label><input type="radio" name="q11" value="1"> Tuple</label>
+            <label><input type="radio" name="q11" value="2"> List</label>
+            <label><input type="radio" name="q11" value="3"> Integer</label>
+        </div>
+
+        <!-- Question 12 -->
+        <div class="question">
+            <p>12. What does the 'break' keyword do?</p>
+            <label><input type="radio" name="q12" value="0"> Breaks the code</label>
+            <label><input type="radio" name="q12" value="1"> Ends the loop</label>
+            <label><input type="radio" name="q12" value="2"> Continues the loop</label>
+            <label><input type="radio" name="q12" value="3"> None of the above</label>
+        </div>
+    </div>
+    <button onclick="submitQuiz()">Submit</button>
+</section>

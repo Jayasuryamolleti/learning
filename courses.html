@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses - E-learning Portal</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: #343a40;
+            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .navbar a:hover {
+            color: #007bff;
+        }
+
+        .content {
+            padding: 100px 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .course-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .course {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            width: 200px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .course:hover {
+            background-color: #f4f4f4;
+        }
+
+        .video-lessons {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .video-lessons h2 {
+            text-align: center;
+        }
+
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .video-container iframe {
+            width: 80%;
+            height: 300px;
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+    <script>
+        function showLessons(courseName) {
+            const lessons = document.querySelectorAll('.video-lessons');
+            lessons.forEach(lesson => lesson.style.display = 'none');
+            document.getElementById(courseName).style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">e-learning</div>
+        <div>
+            <a href="/index.html">Home</a>
+            <a href="/courses.html">Courses</a>
+            <a href="/contact.html">Contact</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Select a Course</h1>
+        <div class="course-list">
+            <div class="course" onclick="showLessons('web-development')">Web Development</div>
+            <div class="course" onclick="showLessons('python')">Python</div>
+            <div class="course" onclick="showLessons('html')">HTML</div>
+            <div class="course" onclick="showLessons('css')">CSS</div>
+            <div class="course" onclick="showLessons('data-science')">Data Science</div>
+            <div class="course" onclick="showLessons('ai')">Artificial Intelligence</div>
+            <div class="course" onclick="showLessons('machine-learning')">Machine Learning</div>
+        </div>
+
+        <div id="web-development" class="video-lessons">
+            <h2>Web Development Lessons</h2>
+            <div class="video-container">
+                <a href="/courses/webdevelopment.html"><button>clickhere</button></a>
+            </div>
+        </div>
+
+        <div id="python" class="video-lessons">
+            <h2>python Lessons</h2>
+            <div class="video-container">
+                <a href="/courses/python.html"><button>clickhere</button></a>
+            </div>
+        </div>
+
+        <div id="html" class="video-lessons">
+            <h2>HTML Lessons</h2>
+            <div class="video-container">
+                <a href="/courses/Html.html"><button>clickhere</button></a>
+            </div>
+        </div>
+
+        <div id="css" class="video-lessons">
+            <h2>CSS Lessons</h2>
+            <div class="video-container">
+                <a href="/courses/css.html"><button>clickhere</button></a>
+            </div>
+        </div>
+
+        <div id="data-science" class="video-lessons">
+            <h2>Data Science Lessons</h2>
+            <div class="video-container">
+                <a href="/courses/Datascience.html"><button>clickhere</button></a>
+            </div>
+        </div>
+
+        <div id="ai" class="video-lessons">
+            <h2>Artificial Intelligence Lessons</h2>
+            <div class="video-container">
+                <a href="/courses/AI.html"><button>clickhere</button></a>
+            </div>
+        </div>
+
+        <div id="machine-learning" class="video-lessons">
+            <h2>Machine Learning Lessons</h2>
+            <div class="video-container">
+                <a href="/courses/ML.html"><buuton>clickhere</buuton></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

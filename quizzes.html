@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzes - E-learning Portal</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 50px;
+        background: #343a40;;
+        color: white;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+
+        .navbar a:hover {
+            color: #007bff;
+        }
+
+        .content {
+            padding: 80px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .course-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .course {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            width: 200px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .course:hover {
+            background-color: #f0f0f0;
+        }
+
+        .quiz-container {
+            display: none;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .options button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .progress-bar-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 20px;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            background-color: #007bff;
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+    <script>
+        const quizData = {
+            "web-development": generateQuestions("Web Development"),
+            "python": generateQuestions("Python"),
+            "html": generateQuestions("HTML"),
+            "css": generateQuestions("CSS"),
+            "data-science": generateQuestions("Data Science"),
+            "ai": generateQuestions("Artificial Intelligence"),
+            "machine-learning": generateQuestions("Machine Learning"),
+        };
+
+        let currentQuiz = [];
+        let currentIndex = 0;
+        let score = 0;
+
+        function generateQuestions(topic) {
+            return Array.from({ length: 30 }, (_, i) => ({
+                question: `${topic} Question ${i + 1}: What is the correct answer?`,
+                options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+                answer: 0, // The correct answer index (e.g., Option 1)
+            }));
+        }
+
+        function startQuiz(course) {
+            document.querySelector(".course-selection").style.display = "none";
+            document.querySelector(".quiz-container").style.display = "block";
+            currentQuiz = quizData[course];
+            currentIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentIndex >= currentQuiz.length) {
+                showResult();
+                return;
+            }
+
+            const quiz = currentQuiz[currentIndex];
+            document.querySelector(".question").innerText = quiz.question;
+            const optionsContainer = document.querySelector(".options");
+            optionsContainer.innerHTML = "";
+            quiz.options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.innerText = option;
+                button.onclick = () => checkAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+
+            updateProgress();
+        }
+
+        function checkAnswer(selected) {
+            if (selected === currentQuiz[currentIndex].answer) {
+                score++;
+            }
+            currentIndex++;
+            showQuestion();
+        }
+
+        function updateProgress() {
+            const progressPercent = ((currentIndex / currentQuiz.length) * 100).toFixed(0);
+            document.querySelector(".progress-bar-fill").style.width = `${progressPercent}%`;
+        }
+
+        function showResult() {
+            document.querySelector(".quiz-container").style.display = "none";
+            const result = document.querySelector(".result");
+            result.innerHTML = `Quiz Completed! Your Score: <strong>${score}/${currentQuiz.length}</strong>`;
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">e-learning</div>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="courses.html">courses</a>
+            <a href="#services">quizzes</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </div>
+    <div class="content">
+        <h1>Select a Course Quiz</h1>
+        <div class="course-selection">
+            <div class="course" onclick="startQuiz('web-development')">Web Development</div>
+            <div class="course" onclick="startQuiz('python')">Python</div>
+            <div class="course" onclick="startQuiz('html')">HTML</div>
+            <div class="course" onclick="startQuiz('css')">CSS</div>
+            <div class="course" onclick="startQuiz('data-science')">Data Science</div>
+            <div class="course" onclick="startQuiz('ai')">Artificial Intelligence</div>
+            <div class="course" onclick="startQuiz('machine-learning')">Machine Learning</div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="question"></div>
+            <div class="options"></div>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result"></div>
+    </div>
+</body>
+</html>
